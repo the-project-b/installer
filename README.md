@@ -1,4 +1,4 @@
-# project B Installer
+# project b Installer
 
 <add cool text no one reads>
 
