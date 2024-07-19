@@ -13,32 +13,32 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 is_directory_empty() {
-  local dir="$1"
-  [ -z "$(ls -A "$dir" 2>/dev/null)" ]
+	local dir="$1"
+	[ -z "$(ls -A "$dir" 2>/dev/null)" ]
 }
 
 git_clone_if_empty() {
-  local repo_url="$1"
-  local target_dir="$2"
+	local repo_url="$1"
+	local target_dir="$2"
 
-  # Check if the target directory exists
-  if [ ! -d "$target_dir" ]; then
-    info "Creating directory: $target_dir"
-    mkdir -p "$target_dir"
-  fi
+	# Check if the target directory exists
+	if [ ! -d "$target_dir" ]; then
+		echo -e "Creating directory: ${BLUE}$target_dir${NC}"
+		mkdir -p "$target_dir"
+	fi
 
-  # Check if the target directory is empty
-  if is_directory_empty "$target_dir"; then
-    info "Cloning repository into $target_dir"
-    git clone "$repo_url" "$target_dir"
-  fi
+	# Check if the target directory is empty
+	if is_directory_empty "$target_dir"; then
+		echo -e "Cloning repository to ${BLUE}$target_dir${NC}"
+		git clone "$repo_url" "$target_dir"
+	fi
 }
 
 # Create the ~/.projectb directory if it doesn't exist
 PROJECTB_DIR="$HOME/.projectb"
 if [ ! -d "$PROJECTB_DIR" ]; then
-  info "Creating directory $PROJECTB_DIR"
-  mkdir -p "$PROJECTB_DIR"
+	echo -e "Creating directory ${BLUE}$PROJECTB_DIR${NC}"
+	mkdir -p "$PROJECTB_DIR"
 fi
 
 # Clone projectb cli to ~/.projectb IF it is empty
@@ -65,10 +65,10 @@ esac
 
 # Add ~/.projectb to the PATH if it's not already there
 if ! grep -q 'export PATH="$HOME/.projectb:$PATH"' "$SHELL_RC"; then
-  info "Adding $PROJECTB_DIR to PATH in $SHELL_RC"
+  echo -e "Adding ${BLUE}$PROJECTB_DIR${NC} to PATH in $SHELL_RC"
   echo 'export PATH="$HOME/.projectb:$PATH"' >> "$SHELL_RC"
 else
-  info "$PROJECTB_DIR is already in PATH"
+  echo -e "${RED}$PROJECTB_DIR${NC} is already in PATH"
 fi
 
 # Function to prompt the user to choose a directory on Linux using zenity
@@ -113,7 +113,7 @@ if [ -z "$CHOSEN_DIR" ]; then
   exit 1
 fi
 
-info "Selected ProjectB installation directory: $CHOSEN_DIR"
+echo -e "Selected ProjectB installation directory: ${BLUE}$CHOSEN_DIR${NC}"
 
 git_clone_if_empty "$PROJECTB_DEV_ENV_GITHUB_REPO" "$CHOSEN_DIR"
 
@@ -126,10 +126,8 @@ ENV_VAR_VAULT_URL="VAULT_ADDR"
 # Update rc file
 if ! grep -q "export $ENV_VAR_NAME=" "$SHELL_RC"; then
   echo "export $ENV_VAR_NAME=\"$CHOSEN_DIR\"" >> "$SHELL_RC"
-  #info "Added $ENV_VAR_NAME to $SHELL_RC"
 else
   sed -i.bak "s|export $ENV_VAR_NAME=.*|export $ENV_VAR_NAME=\"$CHOSEN_DIR\"|" "$SHELL_RC"
-  #info "Updated $ENV_VAR_NAME in $SHELL_RC"
 fi
 
 
